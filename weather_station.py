@@ -11,29 +11,30 @@ from __future__ import print_function
 import datetime
 import sys
 import time
+from urllib import urlencode
 
+import urllib2
 from sense_hat import SenseHat
 
 from config import Config
 
-# import urllib2
-# from urllib import urlencode
-
-
 # ============================================================================
-# Numeric constants
+# Constants
 # ============================================================================
+# set to True to enable upload of weather data to Weather Underground
+WEATHER_UPLOAD = False
 # specifies how often to measure values from the Sense HAT (in minutes)
-measurement_interval = 1  # minutes
+MEASUREMENT_INTERVAL = 1  # minutes
 
-# ============================================================================
-# String constants
-# ============================================================================
-single_hash = "#"
-hashes = "########################################"
-slash_n = "\n"
+SINGLE_HASH = "#"
+HASHES = "########################################"
+SLASH_N = "\n"
 # the weather underground URL used to upload weather data
-weather_underground_url = "http://weatherstation.wunderground.com/weatherstation/updateweatherstation.php"
+WU_URL = "http://weatherstation.wunderground.com/weatherstation/updateweatherstation.php"
+
+
+def c_to_f(input_temp):
+    return round((input_temp * 1.8) + 32, 1)
 
 
 def main():
@@ -54,11 +55,11 @@ def main():
             # reset last_minute to the current_minute
             last_minute = current_minute
             # is minute zero, or divisible by 10?
-            # we're only going to take measurements every measurement_interval minutes
-            if (current_minute == 0) or ((current_minute % measurement_interval) == 0):
+            # we're only going to take measurements every MEASUREMENT_INTERVAL minutes
+            if (current_minute == 0) or ((current_minute % MEASUREMENT_INTERVAL) == 0):
                 # get the reading timestamp
                 now = datetime.datetime.now()
-                print("\n%d minute mark (%d @ %s)" % (measurement_interval, current_minute, str(now)))
+                print("\n%d minute mark (%d @ %s)" % (MEASUREMENT_INTERVAL, current_minute, str(now)))
 
                 # ========================================================
                 # read the temperature from the Sense HAT
@@ -73,26 +74,28 @@ def main():
                 # ========================================================
                 # Upload the weather data to Weather Underground
                 # ========================================================
-                # From http://wiki.wunderground.com/index.php/PWS_-_Upload_Protocol
-                # print("\nUploading data to Weather Underground")
-                # build a weather data object
-                # weather_data = {
-                #     "action": "updateraw",
-                #     "ID": wu_station_id,
-                #     "PASSWORD": wu_station_key,
-                #     "dateutc": "now",
-                #     "tempf": str(temp_f),
-                #     "humidity": str(humidity)
-                # }
-                # try:
-                #     upload_url = weather_underground_url + "?" + urlencode(weather_data)
-                #     response = urllib2.urlopen(upload_url)
-                #     html = response.read()
-                #     print(html)
-                #     # do something
-                #     response.close()  # best practice to close the file
-                # except:
-                #     print("Exception:", sys.exc_info()[0], slash_n)
+                # is weather upload enabled (True)?
+                if WEATHER_UPLOAD:
+                    # From http://wiki.wunderground.com/index.php/PWS_-_Upload_Protocol
+                    print("\nUploading data to Weather Underground")
+                    # build a weather data object
+                    weather_data = {
+                        "action": "updateraw",
+                        "ID": wu_station_id,
+                        "PASSWORD": wu_station_key,
+                        "dateutc": "now",
+                        "tempf": str(temp_f),
+                        "humidity": str(humidity)
+                    }
+                    try:
+                        upload_url = WU_URL + "?" + urlencode(weather_data)
+                        response = urllib2.urlopen(upload_url)
+                        html = response.read()
+                        print(html)
+                        # do something
+                        response.close()  # best practice to close the file
+                    except:
+                        print("Exception:", sys.exc_info()[0], SLASH_N)
 
         # wait a second then check again
         # You can always increase the sleep value below to check less often
@@ -104,14 +107,14 @@ def main():
 # ============================================================================
 # here's where we start doing stuff
 # ============================================================================
-print(slash_n + hashes)
-print(single_hash, "Pi Temperature Station              ", single_hash)
-print(single_hash, "By John M. Wargo (www.johnwargo.com)", single_hash)
-print(hashes)
+print(SLASH_N + HASHES)
+print(SINGLE_HASH, "Pi Temperature Station              ", SINGLE_HASH)
+print(SINGLE_HASH, "By John M. Wargo (www.johnwargo.com)", SINGLE_HASH)
+print(HASHES)
 
-# make sure we don't have a measurement_interval > 60
-if (measurement_interval is None) or (measurement_interval > 60):
-    print("The application's 'measurement_interval' cannot be empty or greater than 60")
+# make sure we don't have a MEASUREMENT_INTERVAL > 60
+if (MEASUREMENT_INTERVAL is None) or (MEASUREMENT_INTERVAL > 60):
+    print("The application's 'MEASUREMENT_INTERVAL' cannot be empty or greater than 60")
     sys.exit(1)
 
 # ============================================================================
@@ -123,11 +126,12 @@ wu_station_key = Config.STATION_KEY
 if (wu_station_id is None) or (wu_station_key is None):
     print("Missing values from the Weather Underground configuration file\n")
     sys.exit(1)
+
 # we made it this far, so it must have worked...
-print("URL:", weather_underground_url)
+print("Successfully read Weather Underground configuration values")
+print("URL:", WU_URL)
 print("Station ID:", wu_station_id)
 print("Station key:", wu_station_key)
-print("Successfully read Weather Underground configuration values")
 
 # ============================================================================
 # initialize the Sense HAT object
@@ -140,9 +144,6 @@ try:
     sense.show_message("Init", text_colour=[255, 255, 0], back_colour=[0, 0, 255])
     # clear the screen
     sense.clear()
-    # get the current temp to use when checking the previous measurement
-    last_temp = c_to_f(sense.get_temperature())
-    print("Current temperature:", last_temp)
 except:
     print("Unable to initialize the Sense HAT library:", sys.exc_info()[0])
     sys.exit(1)

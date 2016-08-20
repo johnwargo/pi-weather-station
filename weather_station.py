@@ -85,7 +85,8 @@ def main():
                         "PASSWORD": wu_station_key,
                         "dateutc": "now",
                         "tempf": str(temp_f),
-                        "humidity": str(humidity)
+                        "humidity": str(humidity),
+                        "baromin": str(pressure),
                     }
                     try:
                         upload_url = WU_URL + "?" + urlencode(weather_data)
@@ -96,6 +97,8 @@ def main():
                         response.close()  # best practice to close the file
                     except:
                         print("Exception:", sys.exc_info()[0], SLASH_N)
+                else:
+                    print("Skipping Weather Underground upload")
 
         # wait a second then check again
         # You can always increase the sleep value below to check less often

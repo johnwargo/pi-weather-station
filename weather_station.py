@@ -4,6 +4,8 @@
     By John M. Wargo
     www.johnwargo.com
 
+    This is a Raspberry Pi project that measures weather values (temperature, humidity and pressure) using
+    the Astro Pi Sense HAT then uploads the data to a Weather Underground weather station.
 ********************************************************************************************************************'''
 
 from __future__ import print_function
@@ -21,16 +23,17 @@ from config import Config
 # ============================================================================
 # Constants
 # ============================================================================
-# set to True to enable upload of weather data to Weather Underground
-WEATHER_UPLOAD = False
 # specifies how often to measure values from the Sense HAT (in minutes)
-MEASUREMENT_INTERVAL = 1  # minutes
-
+MEASUREMENT_INTERVAL = 10  # minutes
+# Set to False when testing the code and/or hardware
+# Set to True to enable upload of weather data to Weather Underground
+WEATHER_UPLOAD = True
+# the weather underground URL used to upload weather data
+WU_URL = "http://weatherstation.wunderground.com/weatherstation/updateweatherstation.php"
+# some string constants
 SINGLE_HASH = "#"
 HASHES = "########################################"
 SLASH_N = "\n"
-# the weather underground URL used to upload weather data
-WU_URL = "http://weatherstation.wunderground.com/weatherstation/updateweatherstation.php"
 
 
 def c_to_f(input_temp):
@@ -92,7 +95,7 @@ def main():
                         upload_url = WU_URL + "?" + urlencode(weather_data)
                         response = urllib2.urlopen(upload_url)
                         html = response.read()
-                        print(html)
+                        print("Server response:", html)
                         # do something
                         response.close()  # best practice to close the file
                     except:
@@ -140,7 +143,7 @@ print("Station key:", wu_station_key)
 # initialize the Sense HAT object
 # ============================================================================
 try:
-    print("\nInitializing the Sense HAT client")
+    print("Initializing the Sense HAT client")
     sense = SenseHat()
     # sense.set_rotation(180)
     # then write some text to the Sense HAT's 'screen'

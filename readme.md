@@ -112,7 +112,7 @@ Starting The Project's Application's Automatically
 
 There are a few steps you must complete to configure the Raspberry Pi so it executes the two python tasks on startup. If you don't already have a terminal window open, open one then navigate to the folder where you extracted the project files. Next, you need to make the project's bash script files executable by executing the following command:
 
-    chmod +x *.sh
+    chmod +x start-station.sh
     
 Next, you'll need to open the pi user's session autostart file using the following command:  
 

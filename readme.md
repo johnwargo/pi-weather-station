@@ -1,13 +1,6 @@
 Pi Temperature Station
 ======================
-This is a Raspberry Pi project that measures temperature and uploads temperature data to Weather Underground. The folks at [Astro Pi](https://astro-pi.org/) created a special add-on board for the Raspberry Pi then solicited elementary school children to create experiments using it that would be executed on the International Space Station. Eventually, many experiments were selected and an astronaut performed them and sent back the results for analysis. 
-
-The Sense HAT board includes instruments that measure temperature, humidity and barometric pressure plus an 8x8 LED display, a joystick, and an accelerometer. I read different articles about this board, so I decided to create a project using it. I'd wanted to install a weather station in my yard and upload the weather data to [Weather Underground](www.weatherunderground.com); the Sense HAT and a Raspberry Pi seemed like a great way to do this.
-
-For this project, I decided to couple the Raspberry Pi with a Sense HAT then write some Python code to implement the features I wanted/needed:
-
-+ Measure weather data (temperature, humidity and barometric pressure) periodically throughout the day. The application defaults to measuring these values every 10 minutes and can be adjusted using the `measurement_interval` configuration variable described elsewhere in this document.
-+ Upload the weather data to Weather Underground. I setup my own weather station, so the data I upload becomes part of the public weatherbase and can be viewed by anyone who wants to know what the weather conditions are in my neighborhood.
+This is a Raspberry Pi project that measures weather values (temperature, humidity and pressure) using the Astro Pi Sense HAT then uploads the data to a Weather Underground weather station. The Sense HAT board includes instruments that measure temperature, humidity and barometric pressure plus an 8x8 LED display, a joystick, and an accelerometer.  The HAT was created by the folks at [Astro Pi](https://astro-pi.org/); elementary school children were solicited to create experiments using the Sense HAT it that would be executed on the International Space Station. Eventually, many experiments were selected and an astronaut performed them and sent back the results for analysis. I read different articles about this board, so I decided to create a project using it. I'd wanted to install a weather station in my yard and upload the weather data to [Weather Underground](www.weatherunderground.com); the Sense HAT and a Raspberry Pi seemed like a great way to do this.
  
 Required Components
 ===================

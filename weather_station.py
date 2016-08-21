@@ -27,7 +27,7 @@ from config import Config
 MEASUREMENT_INTERVAL = 10  # minutes
 # Set to False when testing the code and/or hardware
 # Set to True to enable upload of weather data to Weather Underground
-WEATHER_UPLOAD = True
+WEATHER_UPLOAD = False
 # the weather underground URL used to upload weather data
 WU_URL = "http://weatherstation.wunderground.com/weatherstation/updateweatherstation.php"
 # some string constants
@@ -35,12 +35,51 @@ SINGLE_HASH = "#"
 HASHES = "########################################"
 SLASH_N = "\n"
 
+# code to display an up and down arrow
+# modified from https://www.raspberrypi.org/learning/getting-started-with-the-sense-hat/worksheet/
+# set up the colours (blue, red, empty)
+b = [0, 0, 255]  # blue
+r = [255, 0, 0]  # red
+e = [0, 0, 0]  # empty
+# create images for up and down arrows
+arrow_up = [
+    e, e, e, r, r, e, e, e,
+    e, e, r, r, r, r, e, e,
+    e, r, e, r, r, e, r, e,
+    r, e, e, r, r, e, e, r,
+    e, e, e, r, r, e, e, e,
+    e, e, e, r, r, e, e, e,
+    e, e, e, r, r, e, e, e,
+    e, e, e, r, r, e, e, e
+]
+arrow_down = [
+    e, e, e, b, b, e, e, e,
+    e, e, e, b, b, e, e, e,
+    e, e, e, b, b, e, e, e,
+    e, e, e, b, b, e, e, e,
+    b, e, e, b, b, e, e, b,
+    e, b, e, b, b, e, b, e,
+    e, e, b, b, b, b, e, e,
+    e, e, e, b, b, e, e, e
+]
+bars = [
+    e, e, e, e, e, e, e, e,
+    e, e, e, e, e, e, e, e,
+    r, r, r, r, r, r, r, r,
+    r, r, r, r, r, r, r, r,
+    b, b, b, b, b, b, b, b,
+    b, b, b, b, b, b, b, b,
+    e, e, e, e, e, e, e, e,
+    e, e, e, e, e, e, e, e
+]
+
 
 def c_to_f(input_temp):
     return round((input_temp * 1.8) + 32, 1)
 
 
 def main():
+    global last_temp
     # initialize the lastMinute variable to the current time to start
     last_minute = datetime.datetime.now().minute
     # on startup, just use the previous minute as lastMinute
@@ -73,6 +112,21 @@ def main():
                 temp_c = round(sense.get_temperature(), 1)
                 temp_f = c_to_f(temp_c)
                 print("Temp: %sF (%sC), Pressure: %s inHg, Humidity: %s%%" % (temp_f, temp_c, pressure, humidity))
+
+                # did the temperature go up or down?
+                if last_temp != temp_f:
+                    if last_temp > temp_f:
+                        # display a blue, down arrow
+                        sense.set_pixels(arrow_down)
+                    else:
+                        # display a red, up arrow
+                        sense.set_pixels(arrow_up)
+                else:
+                    # temperature stayed the same
+                    # display red and blue bars
+                    sense.set_pixels(bars)
+                # set last_temp to the current temperature before we measure again
+                last_temp = temp_f
 
                 # ========================================================
                 # Upload the weather data to Weather Underground
@@ -135,9 +189,8 @@ if (wu_station_id is None) or (wu_station_key is None):
 
 # we made it this far, so it must have worked...
 print("Successfully read Weather Underground configuration values")
-print("URL:", WU_URL)
 print("Station ID:", wu_station_id)
-print("Station key:", wu_station_key)
+# print("Station key:", wu_station_key)
 
 # ============================================================================
 # initialize the Sense HAT object
@@ -150,11 +203,14 @@ try:
     sense.show_message("Init", text_colour=[255, 255, 0], back_colour=[0, 0, 255])
     # clear the screen
     sense.clear()
+    # get the current temp to use when checking the previous measurement
+    last_temp = c_to_f(sense.get_temperature())
+    print("Current temperature:", last_temp)
 except:
     print("Unable to initialize the Sense HAT library:", sys.exc_info()[0])
     sys.exit(1)
 
-print("\nInitialization complete!")
+print("Initialization complete!")
 
 # Now see what we're supposed to do next
 if __name__ == "__main__":

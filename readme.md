@@ -36,7 +36,7 @@ Assembly is easy - mount the Sense HAT on the Raspberry Pi then insert it in the
 Weather Underground Setup
 =========================
 
-Weather Underground (WU) is a public weather service now owned by the Weather Channel; it's most well known for enabling everyday people to setup weather stations and upload local weather data into the WU weatherbase for public consumption. Used to upload weather data into the WU weatherbase. Point your browser of choice to [https://www.wunderground.com/weather/api/](https://www.wunderground.com/weather/api/) to setup your weather station. Once you complete the setup, WU will generate a station ID and access key you'll need to access the service from the project. Be sure to capture those values, you'll need them later.
+Weather Underground (WU) is a public weather service now owned by the Weather Channel; it's most well-known for enabling everyday people to setup weather stations and upload local weather data into the WU weatherbase for public consumption. Point your browser of choice to [https://www.wunderground.com/weatherstation/overview.asp](https://www.wunderground.com/weatherstation/overview.asp) to setup your weather station. Once you complete the setup, WU will generate a station ID and access key you'll need to access the service from the project. Be sure to capture those values, you'll need them later.
 
 Installation
 ============
@@ -105,11 +105,8 @@ The terminal window should quickly sprout the following output:
 	
 	Initializing Weather Underground configuration
 	Successfully read Weather Underground configuration values
-	URL: http://weatherstation.wunderground.com/weatherstation/updateweatherstation.php
-	Station ID: YOUR_ID
-	Station key: YOUR_KEY
-	Initializing the Sense HAT client
-	
+	Station ID: YOUR_ID	
+	Initializing the Sense HAT client	
 	Initialization complete!
  
 If you see something like that, you're golden. If not, figure out what any error messages mean, fix things, then try again. At this point, the application will start collecting data and uploading it to the Weather Underground every 10 minutes on the 10 minute mark (unless you changed the app's configuration to make the application work differently).

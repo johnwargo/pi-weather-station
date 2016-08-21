@@ -154,7 +154,7 @@ except:
     print("Unable to initialize the Sense HAT library:", sys.exc_info()[0])
     sys.exit(1)
 
-print("\nInitialization complete!\n")
+print("\nInitialization complete!")
 
 # Now see what we're supposed to do next
 if __name__ == "__main__":

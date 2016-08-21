@@ -27,7 +27,7 @@ from config import Config
 MEASUREMENT_INTERVAL = 10  # minutes
 # Set to False when testing the code and/or hardware
 # Set to True to enable upload of weather data to Weather Underground
-WEATHER_UPLOAD = False
+WEATHER_UPLOAD = True
 # the weather underground URL used to upload weather data
 WU_URL = "http://weatherstation.wunderground.com/weatherstation/updateweatherstation.php"
 # some string constants
@@ -35,7 +35,7 @@ SINGLE_HASH = "#"
 HASHES = "########################################"
 SLASH_N = "\n"
 
-# code to display an up and down arrow
+# constants used to display an up and down arrows plus bars
 # modified from https://www.raspberrypi.org/learning/getting-started-with-the-sense-hat/worksheet/
 # set up the colours (blue, red, empty)
 b = [0, 0, 255]  # blue

@@ -81,6 +81,19 @@ In order to upload weather data to the Weather Underground service, the applicat
 
 Refer to the Weather Underground [Personal Weather Station Network](https://www.wunderground.com/personal-weather-station/mypws) to access these values.
 
+The main application file, `weather_station.py` has two configuration settings that control how the program operates. Open the file in your favorite text editor and look for the following line near the beginning of the file:
+
+	# specifies how often to measure values from the Sense HAT (in minutes)
+	MEASUREMENT_INTERVAL = 10  # minutes
+
+The MEASUREMENT_INTERVAL variable controls how often the application reads temperature measurements from the Sense HAT. To change how often the application checks temperature values, change the value on the right of the equals sign on the second line.
+
+If you’re testing the application and don’t want the weather data uploaded to Weather Underground until you're ready, change the value for `WEATHER_UPLOAD` to `True` (case matters, so it has to be `True`, not `true`):
+
+	# Set to False when testing the code and/or hardware
+	# Set to True to enable upload of weather data to Weather Underground
+	WEATHER_UPLOAD = False
+
 Testing the Application
 =======================
   
@@ -106,7 +119,7 @@ If you see something like that, you're golden. If not, figure out what any error
 Starting The Project's Application's Automatically
 --------------------------------------------------
 
-There are a few steps you must complete to configure the Raspberry Pi so it executes the two python tasks on startup. If you don't already have a terminal window open, open one then navigate to the folder where you extracted the project files. Next, you need to make the project's bash script files executable by executing the following command:
+There are a few steps you must complete to configure the Raspberry Pi so it executes the project's python application on startup. If you don't already have a terminal window open, open one then navigate to the folder where you extracted the project files. Next, you need to make the project's bash script files executable by executing the following command:
 
     chmod +x start-station.sh
     

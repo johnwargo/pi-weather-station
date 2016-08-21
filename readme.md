@@ -1,5 +1,6 @@
-Pi Temperature Station
-======================
+Pi Weather Station
+==================
+
 This is a Raspberry Pi project that measures weather values (temperature, humidity and pressure) using the Astro Pi Sense HAT then uploads the data to a Weather Underground weather station. The Sense HAT board includes instruments that measure temperature, humidity and barometric pressure plus an 8x8 LED display, a joystick, and an accelerometer.  The HAT was created by the folks at [Astro Pi](https://astro-pi.org/); elementary school children were solicited to create experiments using the Sense HAT it that would be executed on the International Space Station. Eventually, many experiments were selected and an astronaut performed them and sent back the results for analysis. I read different articles about this board, so I decided to create a project using it. I'd wanted to install a weather station in my yard and upload the weather data to [Weather Underground](www.weatherunderground.com); the Sense HAT and a Raspberry Pi seemed like a great way to do this.
  
 Required Components
@@ -14,13 +15,6 @@ This project is very easy to assemble, all you need is the following 4 parts, an
 
 **Note:** *When I started this project, there were quite a few companies selling Sense HAT devices, but very few of them had stock available. I finally found I could purchase one of the through Amazon.com, but when I plugged everything together and ran my code, I got results that didn't make sense. After sending that board back and getting another one with the same problem, I discovered it wasn't my code at fault. It turns out that Astro Pi used some faulty components in a batch of them and had to fix that problem before shipping any more. Refer to [Defective Astro Pi Sense HAT Boards](http://johnwargo.com/index.php/microcontrollers-single-board-computers/defective-astro-pi-sense-hat-boards.html) for more information about the faulty Sense HAT boards.*
 
-Assembly
-========
-
-Assembly is easy - mount the Sense HAT on the Raspberry Pi then insert it in the case and plug it into power. All set! No wiring, soldering or anything else required.
-
-**Note:** *The Raspberry Pi foundation recommend you mount the Sense HAT to the Raspberry Pi using [standoffs](http://www.mouser.com/Electromechanical/Hardware/Standoffs-Spacers/_/N-aictf) and the Sense HAT I purchased included them in the package. Unfortunately, standoffs are incompatible with the C4 Labs Zebra Case and their Official Sense HAT upgrade for Zebra Case. Be sure to omit standoffs if using this case.*
-
 Project Files
 =============
 
@@ -31,6 +25,13 @@ The project folder contains several files and one folder:
 + `readme.md` - This file. 
 + `start-station.sh` - Shell script to start the weather station process. 
 + `weather_station.py` - The main data collection application for this project. You'll run this application to read the Sense HAT board and post the collected data.   
+
+Hardware Assembly
+=================
+
+Assembly is easy - mount the Sense HAT on the Raspberry Pi then insert it in the case and plug it into power. All set! No wiring, soldering or anything else required.
+
+**Note:** *The Raspberry Pi foundation recommend you mount the Sense HAT to the Raspberry Pi using [standoffs](http://www.mouser.com/Electromechanical/Hardware/Standoffs-Spacers/_/N-aictf) and the Sense HAT I purchased included them in the package. Unfortunately, standoffs are incompatible with the C4 Labs Zebra Case and their Official Sense HAT upgrade for Zebra Case. Be sure to omit standoffs if using this case.*
 
 Weather Underground Setup
 =========================
@@ -102,7 +103,13 @@ The terminal window should quickly sprout the following output:
 	# By John M. Wargo (www.johnwargo.com) #
 	########################################
 	
-	Opening configuration file		
+	Initializing Weather Underground configuration
+	Successfully read Weather Underground configuration values
+	URL: http://weatherstation.wunderground.com/weatherstation/updateweatherstation.php
+	Station ID: YOUR_ID
+	Station key: YOUR_KEY
+	Initializing the Sense HAT client
+	
 	Initialization complete!
  
 If you see something like that, you're golden. If not, figure out what any error messages mean, fix things, then try again. At this point, the application will start collecting data and uploading it to the Weather Underground every 10 minutes on the 10 minute mark (unless you changed the app's configuration to make the application work differently).

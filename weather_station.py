@@ -114,7 +114,7 @@ def main():
 # here's where we start doing stuff
 # ============================================================================
 print(SLASH_N + HASHES)
-print(SINGLE_HASH, "Pi Temperature Station              ", SINGLE_HASH)
+print(SINGLE_HASH, "Pi Weather Station                  ", SINGLE_HASH)
 print(SINGLE_HASH, "By John M. Wargo (www.johnwargo.com)", SINGLE_HASH)
 print(HASHES)
 

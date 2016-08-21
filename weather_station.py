@@ -80,7 +80,7 @@ def main():
                 # is weather upload enabled (True)?
                 if WEATHER_UPLOAD:
                     # From http://wiki.wunderground.com/index.php/PWS_-_Upload_Protocol
-                    print("\nUploading data to Weather Underground")
+                    print("Uploading data to Weather Underground")
                     # build a weather data object
                     weather_data = {
                         "action": "updateraw",

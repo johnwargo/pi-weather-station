@@ -56,26 +56,8 @@ Next, you'll need to install support packages for the Sense HAT. In the same ter
 
     sudo apt-get install sense-hat
 	   
-Project Configuration
-=====================
-
-In order to upload weather data to the Weather Underground service, the application needs access to the station ID and station access key you created earlier in this setup process. Open the project's `config.py` in your editor of choice and populate the `STATION_ID` and `STATION_KEY` fields with the appropriate values from your Weather Underground Weather Station: 
-
-	class Config:
-    	# Weather Underground
-    	STATION_ID = ""
-    	STATION_KEY = ""
-
-Refer to the Weather Underground [Personal Weather Station Network](https://www.wunderground.com/personal-weather-station/mypws) to access these values.
-
-Deployment
-==========
-The project consists of two parts, a data collection app (written in Python) and a web server application (written in Python, using Flask). Both processes are intended to run constantly on the Raspberry Pi. All of the files reside in the same folder structure, so it will be easy to deploy on the Pi.
-
 Installation
-------------
-
-Modify the project's configuration as needed for your environment. Use the information in the Configuration section to guide your efforts.
+============
 
 Make a folder in the pi user's home folder. to do this, open a terminal window and enter the following command:
  
@@ -87,10 +69,20 @@ For example:
 
 Copy the project files into the folder that was just created.
 
-Testing the Project's Python Applications
------------------------------------------
+Configuration
+=============
 
-Now, being an experienced software developer, I know things never work as expected the first time. I've not yet been able to figure out how to execute a Python application on the Raspberry Pi on startup in a terminal window, so if you use the automatic startup options described later, you won't be able to easily see if everything is working. So, before you setup an automated startup for these two Python applications, you had better execute them manually first, just to make sure they're working correctly.
+In order to upload weather data to the Weather Underground service, the application needs access to the station ID and station access key you created earlier in this setup process. Open the project's `config.py` in your editor of choice and populate the `STATION_ID` and `STATION_KEY` fields with the appropriate values from your Weather Underground Weather Station: 
+
+	class Config:
+    	# Weather Underground
+    	STATION_ID = ""
+    	STATION_KEY = ""
+
+Refer to the Weather Underground [Personal Weather Station Network](https://www.wunderground.com/personal-weather-station/mypws) to access these values.
+
+Testing the Application
+=======================
   
 To execute the data collection application, open a terminal window, navigate to the folder where you copied the project files and execute the following command: 
 

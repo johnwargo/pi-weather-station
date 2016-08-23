@@ -131,7 +131,7 @@ Add the following lines to the end (bottom) of the file:
 
 	@lxterminal -e /home/pi/pi_weather/start-station.sh	
 
-To save your changes, press ctrl-O then press the Enter key. Next, press ctrl-x to exit the nano application.
+To save your changes, press ctrl-o then press the Enter key. Next, press ctrl-x to exit the nano application.
   
 Reboot the Raspberry Pi. When it restarts, both python processes should execute in a terminal window as shown in Figure 4. 
 

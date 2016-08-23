@@ -133,7 +133,7 @@ Add the following lines to the end (bottom) of the file:
 
 To save your changes, press ctrl-O then press the Enter key. Next, press ctrl-x to exit the nano application.
   
-Reboot the Raspberry Pi. When it restarts, both python processes should execute in terminal windows as shown in Figure 4. 
+Reboot the Raspberry Pi. When it restarts, both python processes should execute in a terminal window as shown in Figure 4. 
 
 ![Weather Monitor Home Page](http://johnwargo.com/files/pi-weather-station-800.png)
 

@@ -116,14 +116,14 @@ def main():
                 # https://www.raspberrypi.org/forums/viewtopic.php?f=104&t=111457
                 # so we'll have to do some approximation of the actual temp taking CPU temp into account
                 # first, get the CPU temp
-                cpuTemp = int(float(getCPUtemperature()))
+                cpu_temp = int(float(getCPUtemperature()))
                 # next use get_temperature_from_pressure() to read the temp as get_temperature is less accurate
                 ambient = sense.get_temperature_from_pressure()
                 # calculate the ambient temperature
-                calctemp = ambient - ((cpuTemp - ambient) / 1.5)
+                calc_temp = ambient - ((cpu_temp - ambient) / 1.5)
                 # now use it for our purposes
-                temp_c = round(calctemp, 1)
-                temp_f = c_to_f(temp_c)
+                temp_c = round(calc_temp, 1)
+                temp_f = c_to_f(calc_temp)
                 humidity = round(sense.get_humidity(), 2)
                 # convert pressure from millibars to inHg before posting
                 pressure = round(sense.get_pressure() * 0.0295300, 2)

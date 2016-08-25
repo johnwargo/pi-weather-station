@@ -78,6 +78,12 @@ def c_to_f(input_temp):
     return round((input_temp * 1.8) + 32, 1)
 
 
+def getCPUtemperature():
+    # from https://www.raspberrypi.org/forums/viewtopic.php?f=104&t=111457
+    res = os.popen('vcgencmd measure_temp').readline()
+    return (res.replace("temp=", "").replace("'C\n", ""))
+
+    
 def main():
     global last_temp
     # initialize the lastMinute variable to the current time to start
@@ -106,11 +112,21 @@ def main():
                 # ========================================================
                 # read the temperature from the Sense HAT
                 # ========================================================
+                # Unfortunately, getting an accurate temperature reading from the Sense HAT is improbably
+                # https://www.raspberrypi.org/forums/viewtopic.php?f=104&t=111457
+                # so we'll have to do some approximation of the actual temp taking CPU temp into account
+                # first, get the CPU temp
+                cpuTemp = int(float(getCPUtemperature()))
+                # next use get_temperature_from_pressure() to read the temp as get_temperature is less accurate
+                ambient = sense.get_temperature_from_pressure()
+                # calculate the ambient temperature
+                calctemp = ambient - ((cpuTemp - ambient) / 1.5)
+                # now use it for our purposes
+                temp_c = round(calctemp, 1)
+                temp_f = c_to_f(temp_c)
                 humidity = round(sense.get_humidity(), 2)
                 # convert pressure from millibars to inHg before posting
                 pressure = round(sense.get_pressure() * 0.0295300, 2)
-                temp_c = round(sense.get_temperature(), 1)
-                temp_f = c_to_f(temp_c)
                 print("Temp: %sF (%sC), Pressure: %s inHg, Humidity: %s%%" % (temp_f, temp_c, pressure, humidity))
 
                 # did the temperature go up or down?

@@ -11,6 +11,7 @@
 from __future__ import print_function
 
 import datetime
+import os
 import sys
 import time
 from urllib import urlencode
@@ -75,15 +76,25 @@ bars = [
 
 
 def c_to_f(input_temp):
-    return round((input_temp * 1.8) + 32, 1)
+    return (input_temp * 1.8) + 32
 
 
-def getCPUtemperature():
-    # from https://www.raspberrypi.org/forums/viewtopic.php?f=104&t=111457
+def get_cpu_temperature():
+    # 'borrowed' from https://www.raspberrypi.org/forums/viewtopic.php?f=104&t=111457
     res = os.popen('vcgencmd measure_temp').readline()
-    return (res.replace("temp=", "").replace("'C\n", ""))
+    return res.replace("temp=", "").replace("'C\n", "")
 
-    
+def get_temp():
+    # Unfortunately, getting an accurate temperature reading from the Sense HAT is improbable
+    # https://www.raspberrypi.org/forums/viewtopic.php?f=104&t=111457
+    # so we'll have to do some approximation of the actual temp taking CPU temp into account
+    # first, get the CPU temp
+    cpu_temp = int(float(get_cpu_temperature()))
+    # next use get_temperature_from_pressure() to read the temp as get_temperature is less accurate
+    ambient = sense.get_temperature_from_pressure()
+    # calculate the ambient temperature
+    return ambient - ((cpu_temp - ambient) / 1.5)
+
 def main():
     global last_temp
     # initialize the lastMinute variable to the current time to start
@@ -99,6 +110,9 @@ def main():
         current_minute = datetime.datetime.now().minute
         # is it the same minute as the last time we checked?
         if current_minute != last_minute:
+
+            print("Current temperature reading:", round(c_to_f(get_temp()), 1))
+
             # print("Checking minute:", current_minute)
             # reset last_minute to the current_minute
             last_minute = current_minute
@@ -110,20 +124,12 @@ def main():
                 print("\n%d minute mark (%d @ %s)" % (MEASUREMENT_INTERVAL, current_minute, str(now)))
 
                 # ========================================================
-                # read the temperature from the Sense HAT
+                # read the values from the Sense HAT
                 # ========================================================
-                # Unfortunately, getting an accurate temperature reading from the Sense HAT is improbably
-                # https://www.raspberrypi.org/forums/viewtopic.php?f=104&t=111457
-                # so we'll have to do some approximation of the actual temp taking CPU temp into account
-                # first, get the CPU temp
-                cpu_temp = int(float(getCPUtemperature()))
-                # next use get_temperature_from_pressure() to read the temp as get_temperature is less accurate
-                ambient = sense.get_temperature_from_pressure()
-                # calculate the ambient temperature
-                calc_temp = ambient - ((cpu_temp - ambient) / 1.5)
-                # now use it for our purposes
+                # guistimate the temperature
+                calc_temp = get_temp()
                 temp_c = round(calc_temp, 1)
-                temp_f = c_to_f(calc_temp)
+                temp_f = round(c_to_f(calc_temp), 1)
                 humidity = round(sense.get_humidity(), 2)
                 # convert pressure from millibars to inHg before posting
                 pressure = round(sense.get_pressure() * 0.0295300, 2)
@@ -220,8 +226,8 @@ try:
     # clear the screen
     sense.clear()
     # get the current temp to use when checking the previous measurement
-    last_temp = c_to_f(sense.get_temperature())
-    print("Current temperature:", last_temp)
+    last_temp = c_to_f(get_temp())
+    print("Current temperature reading:", round(last_temp, 1))
 except:
     print("Unable to initialize the Sense HAT library:", sys.exc_info()[0])
     sys.exit(1)

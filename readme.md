@@ -86,7 +86,7 @@ The main application file, `weather_station.py` has two configuration settings t
 	# specifies how often to measure values from the Sense HAT (in minutes)
 	MEASUREMENT_INTERVAL = 10  # minutes
 
-The MEASUREMENT_INTERVAL variable controls how often the application reads temperature measurements from the Sense HAT. To change how often the application checks temperature values, change the value on the right of the equals sign on the second line.
+The `MEASUREMENT_INTERVAL` variable controls how often the application reads temperature measurements from the Sense HAT. To change how often the application checks temperature values, change the value on the right of the equals sign on the second line.
 
 If you’re testing the application and don’t want the weather data uploaded to Weather Underground until you're ready, change the value for `WEATHER_UPLOAD` to `True` (case matters, so it has to be `True`, not `true`):
 
@@ -142,7 +142,7 @@ Figure 1 - Raspberry Pi Weather Station
 Revision History
 ================
 
-None yet!
+09/12/2016 - On recommendation from the Raspberry Pi Foundation, changed the algorithm for guestimating ambient temperature from [this article](http://yaab-arduino.blogspot.co.uk/2016/08/accurate-temperature-reading-sensehat.html).
 
 ***
 

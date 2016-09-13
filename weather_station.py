@@ -76,24 +76,57 @@ bars = [
 
 
 def c_to_f(input_temp):
+    # convert input_temp from Celsius to Fahrenheit
     return (input_temp * 1.8) + 32
 
 
-def get_cpu_temperature():
+def get_cpu_temp():
     # 'borrowed' from https://www.raspberrypi.org/forums/viewtopic.php?f=104&t=111457
+    # executes a command at the OS to pull in the CPU temperature
     res = os.popen('vcgencmd measure_temp').readline()
-    return res.replace("temp=", "").replace("'C\n", "")
+    return float(res.replace("temp=", "").replace("'C\n", ""))
+
+
+# use moving average to smooth readings
+def get_smooth(x):
+    # do we have the t object?
+    if not hasattr(get_smooth, "t"):
+        # then create it
+        get_smooth.t = [x, x, x]
+    # manage the rolling previous values
+    get_smooth.t[2] = get_smooth.t[1]
+    get_smooth.t[1] = get_smooth.t[0]
+    get_smooth.t[0] = x
+    # average the three last temperatures
+    xs = (get_smooth.t[0] + get_smooth.t[1] + get_smooth.t[2]) / 3
+    return xs
+
 
 def get_temp():
-    # Unfortunately, getting an accurate temperature reading from the Sense HAT is improbable
+    # ====================================================================
+    # Unfortunately, getting an accurate temperature reading from the
+    # Sense HAT is improbable, see here:
     # https://www.raspberrypi.org/forums/viewtopic.php?f=104&t=111457
-    # so we'll have to do some approximation of the actual temp taking CPU temp into account
-    # first, get the CPU temp
-    cpu_temp = int(float(get_cpu_temperature()))
-    # next use get_temperature_from_pressure() to read the temp as get_temperature is less accurate
-    ambient = sense.get_temperature_from_pressure()
-    # calculate the ambient temperature
-    return ambient - ((cpu_temp - ambient) / 1.5)
+    # so we'll have to do some approximation of the actual temp
+    # taking CPU temp into account. The Pi foundation recommended
+    # using the following:
+    # http://yaab-arduino.blogspot.co.uk/2016/08/accurate-temperature-reading-sensehat.html
+    # ====================================================================
+    # First, get temp readings from both sensors
+    t1 = sense.get_temperature_from_humidity()
+    t2 = sense.get_temperature_from_pressure()
+    # t becomes the average of the temperatures from both sensors
+    t = (t1 + t2) / 2
+    # Now, grab the CPU temperature
+    t_cpu = get_cpu_temp()
+    # Calculate the 'real' temperature compensating for CPU heating
+    t_corr = t - ((t_cpu - t) / 1.5)
+    # Finally, average out that value across the last three readings
+    t_corr = get_smooth(t_corr)
+    # convoluted, right?
+    # Return the calculated temperature
+    return t_corr
+
 
 def main():
     global last_temp
@@ -110,10 +143,6 @@ def main():
         current_minute = datetime.datetime.now().minute
         # is it the same minute as the last time we checked?
         if current_minute != last_minute:
-
-            print("Current temperature reading:", round(c_to_f(get_temp()), 1))
-
-            # print("Checking minute:", current_minute)
             # reset last_minute to the current_minute
             last_minute = current_minute
             # is minute zero, or divisible by 10?
@@ -122,12 +151,12 @@ def main():
                 # get the reading timestamp
                 now = datetime.datetime.now()
                 print("\n%d minute mark (%d @ %s)" % (MEASUREMENT_INTERVAL, current_minute, str(now)))
-
                 # ========================================================
                 # read the values from the Sense HAT
                 # ========================================================
-                # guistimate the temperature
+                # guestimate the temperature
                 calc_temp = get_temp()
+                # and use it for our purposes
                 temp_c = round(calc_temp, 1)
                 temp_f = round(c_to_f(calc_temp), 1)
                 humidity = round(sense.get_humidity(), 2)
@@ -226,8 +255,8 @@ try:
     # clear the screen
     sense.clear()
     # get the current temp to use when checking the previous measurement
-    last_temp = c_to_f(get_temp())
-    print("Current temperature reading:", round(last_temp, 1))
+    last_temp = round(c_to_f(get_temp()), 1)
+    print("Current temperature reading:", last_temp)
 except:
     print("Unable to initialize the Sense HAT library:", sys.exc_info()[0])
     sys.exit(1)

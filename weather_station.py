@@ -130,83 +130,90 @@ def get_temp():
 
 def main():
     global last_temp
+
     # initialize the lastMinute variable to the current time to start
     last_minute = datetime.datetime.now().minute
     # on startup, just use the previous minute as lastMinute
+    last_minute -= 1
     if last_minute == 0:
         last_minute = 59
-    else:
-        last_minute -= 1
+
     # infinite loop to continuously check weather values
     while 1:
-        # get the current minute
-        current_minute = datetime.datetime.now().minute
-        # is it the same minute as the last time we checked?
-        if current_minute != last_minute:
-            # reset last_minute to the current_minute
-            last_minute = current_minute
-            # is minute zero, or divisible by 10?
-            # we're only going to take measurements every MEASUREMENT_INTERVAL minutes
-            if (current_minute == 0) or ((current_minute % MEASUREMENT_INTERVAL) == 0):
-                # get the reading timestamp
-                now = datetime.datetime.now()
-                print("\n%d minute mark (%d @ %s)" % (MEASUREMENT_INTERVAL, current_minute, str(now)))
-                # ========================================================
-                # read the values from the Sense HAT
-                # ========================================================
-                # guestimate the temperature
-                calc_temp = get_temp()
-                # and use it for our purposes
-                temp_c = round(calc_temp, 1)
-                temp_f = round(c_to_f(calc_temp), 1)
-                humidity = round(sense.get_humidity(), 2)
-                # convert pressure from millibars to inHg before posting
-                pressure = round(sense.get_pressure() * 0.0295300, 2)
-                print("Temp: %sF (%sC), Pressure: %s inHg, Humidity: %s%%" % (temp_f, temp_c, pressure, humidity))
+        # The temp measurement smoothing algorithm's accuracy is based
+        # on frequent measurements, so we'll take measurements every 5 seconds
+        # but only upload on measurement_interval
+        current_second = datetime.datetime.now().second
+        # are we at the top of the minute or at a 5 second interval?
+        if (current_second == 0) or ((current_second % 5) == 0):
+            # ========================================================
+            # read values from the Sense HAT
+            # ========================================================
+            # calculate the temperature
+            calc_temp = get_temp()
+            # now use it for our purposes
+            temp_c = round(calc_temp, 1)
+            temp_f = round(c_to_f(calc_temp), 1)
+            humidity = round(sense.get_humidity(), 0)
+            # convert pressure from millibars to inHg before posting
+            pressure = round(sense.get_pressure() * 0.0295300, 1)
+            print("Temp: %sF (%sC), Pressure: %s inHg, Humidity: %s%%" % (temp_f, temp_c, pressure, humidity))
 
-                # did the temperature go up or down?
-                if last_temp != temp_f:
-                    if last_temp > temp_f:
-                        # display a blue, down arrow
-                        sense.set_pixels(arrow_down)
+            # get the current minute
+            current_minute = datetime.datetime.now().minute
+            # is it the same minute as the last time we checked?
+            if current_minute != last_minute:
+                # reset last_minute to the current_minute
+                last_minute = current_minute
+                # is minute zero, or divisible by 10?
+                # we're only going to take measurements every MEASUREMENT_INTERVAL minutes
+                if (current_minute == 0) or ((current_minute % MEASUREMENT_INTERVAL) == 0):
+                    # get the reading timestamp
+                    now = datetime.datetime.now()
+                    print("\n%d minute mark (%d @ %s)" % (MEASUREMENT_INTERVAL, current_minute, str(now)))
+                    # did the temperature go up or down?
+                    if last_temp != temp_f:
+                        if last_temp > temp_f:
+                            # display a blue, down arrow
+                            sense.set_pixels(arrow_down)
+                        else:
+                            # display a red, up arrow
+                            sense.set_pixels(arrow_up)
                     else:
-                        # display a red, up arrow
-                        sense.set_pixels(arrow_up)
-                else:
-                    # temperature stayed the same
-                    # display red and blue bars
-                    sense.set_pixels(bars)
-                # set last_temp to the current temperature before we measure again
-                last_temp = temp_f
+                        # temperature stayed the same
+                        # display red and blue bars
+                        sense.set_pixels(bars)
+                    # set last_temp to the current temperature before we measure again
+                    last_temp = temp_f
 
-                # ========================================================
-                # Upload the weather data to Weather Underground
-                # ========================================================
-                # is weather upload enabled (True)?
-                if WEATHER_UPLOAD:
-                    # From http://wiki.wunderground.com/index.php/PWS_-_Upload_Protocol
-                    print("Uploading data to Weather Underground")
-                    # build a weather data object
-                    weather_data = {
-                        "action": "updateraw",
-                        "ID": wu_station_id,
-                        "PASSWORD": wu_station_key,
-                        "dateutc": "now",
-                        "tempf": str(temp_f),
-                        "humidity": str(humidity),
-                        "baromin": str(pressure),
-                    }
-                    try:
-                        upload_url = WU_URL + "?" + urlencode(weather_data)
-                        response = urllib2.urlopen(upload_url)
-                        html = response.read()
-                        print("Server response:", html)
-                        # do something
-                        response.close()  # best practice to close the file
-                    except:
-                        print("Exception:", sys.exc_info()[0], SLASH_N)
-                else:
-                    print("Skipping Weather Underground upload")
+                    # ========================================================
+                    # Upload the weather data to Weather Underground
+                    # ========================================================
+                    # is weather upload enabled (True)?
+                    if WEATHER_UPLOAD:
+                        # From http://wiki.wunderground.com/index.php/PWS_-_Upload_Protocol
+                        print("Uploading data to Weather Underground")
+                        # build a weather data object
+                        weather_data = {
+                            "action": "updateraw",
+                            "ID": wu_station_id,
+                            "PASSWORD": wu_station_key,
+                            "dateutc": "now",
+                            "tempf": str(temp_f),
+                            "humidity": str(humidity),
+                            "baromin": str(pressure),
+                        }
+                        try:
+                            upload_url = WU_URL + "?" + urlencode(weather_data)
+                            response = urllib2.urlopen(upload_url)
+                            html = response.read()
+                            print("Server response:", html)
+                            # do something
+                            response.close()  # best practice to close the file
+                        except:
+                            print("Exception:", sys.exc_info()[0], SLASH_N)
+                    else:
+                        print("Skipping Weather Underground upload")
 
         # wait a second then check again
         # You can always increase the sleep value below to check less often

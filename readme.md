@@ -137,7 +137,7 @@ To save your changes, press ctrl-o then press the Enter key. Next, press ctrl-x 
   
 Reboot the Raspberry Pi. When it restarts, both python processes should execute in a terminal window as shown in Figure 4. 
 
-![Weather Monitor Home Page](http://johnwargo.com/files/pi-weather-station-800.png)
+![Weather Monitor Home Page](screenshots/pi-weather-station-800.png)
 
 Figure 1 - Raspberry Pi Weather Station
 

@@ -149,9 +149,19 @@ def main():
             # ========================================================
             # read values from the Sense HAT
             # ========================================================
-            # calculate the temperature
+            # Calculate the temperature. The get_temp function 'adjusts' the recorded temperature adjusted for the
+            # current processor temp in order to accommodate any temperature leakage from the processor to
+            # the Sense HAT's sensor. This happens when the Sense HAT is mounted on the Pi in a case.
+            # If you've mounted the Sense HAT outside of the Raspberry Pi case, then you don't need that
+            # calculation. So, when the Sense HAT is external, replace the following line (comment it out  with a #)
             calc_temp = get_temp()
-            # now use it for our purposes
+            # with the following line (uncomment it, remove the # at the line start)
+            # calc_temp = sense.get_temperature_from_pressure()
+            # or the following line (each will work)
+            # calc_temp = sense.get_temperature_from_humidity()
+            # ========================================================
+            # At this point, we should have an accurate temperature, so lets use the recorded (or calculated)
+            # temp for our purposes
             temp_c = round(calc_temp, 1)
             temp_f = round(c_to_f(calc_temp), 1)
             humidity = round(sense.get_humidity(), 0)

@@ -8,14 +8,15 @@ Note: If you'd like to display one of the measurements on the display instead of
 Required Components
 ===================
 
-This project is very easy to assemble, all you need is the following 4 parts, and they all connect together:
-
 + [Raspberry Pi 3](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/) - I selected this model because it has built in Wi-Fi capabilities. You can use one of the other models, but you'll need to also purchase a Wi-Fi module or run the device on a wired connection.
 + [Astro Pi Sense HAT](https://www.adafruit.com/product/2738). There was a bad batch of Sense HAT device out there, so be careful. See the note below.
 + Raspberry Pi case. The only commercial case I could find that supports the Sense HAT is the [Zebra Case](http://c4labs.net/collections/all/zebra-case) from C4 Labs with the [Official Sense HAT upgrade for Zebra Case](http://c4labs.net/products/official-sense-hat-upgrade-for-zebra-case). You can also 3D print a case, you can find plans here: [http://www.thingiverse.com/thing:1200534](http://www.thingiverse.com/thing:1200534).
 + Raspberry Pi Power Adapter. I used this one from [Amazon](http://amzn.to/29VVzT4). 
+Addtional Parts Needed
++ SD Card >8GB
++ 
 
-**Note:** *When I started this project, there were quite a few companies selling Sense HAT devices, but very few of them had stock available. I finally found I could purchase one of the through Amazon.com, but when I plugged everything together and ran my code, I got results that didn't make sense. After sending that board back and getting another one with the same problem, I discovered it wasn't my code at fault. It turns out that Astro Pi used some faulty components in a batch of them and had to fix that problem before shipping any more. Refer to [Defective Astro Pi Sense HAT Boards](http://johnwargo.com/index.php/microcontrollers-single-board-computers/defective-astro-pi-sense-hat-boards.html) for more information about the faulty Sense HAT boards.*
+**Note:*** When I started this project, there were quite a few companies selling Sense HAT devices, but very few of them had stock available. I finally found I could purchase one of the through Amazon.com, but when I plugged everything together and ran my code, I got results that didn't make sense. After sending that board back and getting another one with the same problem, I discovered it wasn't my code at fault. It turns out that Astro Pi used some faulty components in a batch of them and had to fix that problem before shipping any more. Refer to [Defective Astro Pi Sense HAT Boards](http://johnwargo.com/index.php/microcontrollers-single-board-computers/defective-astro-pi-sense-hat-boards.html) for more information about the faulty Sense HAT boards.*
 
 Project Files
 =============

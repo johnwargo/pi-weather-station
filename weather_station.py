@@ -25,7 +25,7 @@ from config import Config
 # Constants
 # ============================================================================
 # specifies how often to measure values from the Sense HAT (in minutes)
-MEASUREMENT_INTERVAL = 10  # minutes
+MEASUREMENT_INTERVAL = 2  # minutes
 # Set to False when testing the code and/or hardware
 # Set to True to enable upload of weather data to Weather Underground
 WEATHER_UPLOAD = True

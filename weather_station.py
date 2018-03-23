@@ -1,12 +1,12 @@
 #!/usr/bin/python
-'''*****************************************************************************************************************
-    Pi Temperature Station
-    By John M. Wargo
-    www.johnwargo.com
-
-    This is a Raspberry Pi project that measures weather values (temperature, humidity and pressure) using
-    the Astro Pi Sense HAT then uploads the data to a Weather Underground weather station.
-********************************************************************************************************************'''
+# *****************************************************************************************************************
+#  AWS Pi Temperature Station
+#  By Dan Beerman
+#
+#  This is a Raspberry Pi project that measures weather values (temperature, humidity and pressure) using
+#  the Astro Pi Sense HAT then uploads the data to a Weather Underground weather station.
+#  Opens Source refs from: John Wargo, Calvin Boey (https://github.com/szazo/DHT11_Python)
+# ********************************************************************************************************************'''
 
 from __future__ import print_function
 
@@ -236,8 +236,8 @@ def main():
 # here's where we start doing stuff
 # ============================================================================
 print(SLASH_N + HASHES)
-print(SINGLE_HASH, "Pi Weather Station                  ", SINGLE_HASH)
-print(SINGLE_HASH, "By John M. Wargo (www.johnwargo.com)", SINGLE_HASH)
+print(SINGLE_HASH, "Temp, Humidity, Barometric Pressue ", SINGLE_HASH)
+print(SINGLE_HASH, "By Dan Beerman", SINGLE_HASH)
 print(HASHES)
 
 # make sure we don't have a MEASUREMENT_INTERVAL > 60
@@ -268,7 +268,7 @@ try:
     sense = SenseHat()
     # sense.set_rotation(180)
     # then write some text to the Sense HAT's 'screen'
-    sense.show_message("Init", text_colour=[255, 255, 0], back_colour=[0, 0, 255])
+    sense.show_message("Initialized", text_colour=[255, 255, 0], back_colour=[0, 0, 255])
     # clear the screen
     sense.clear()
     # get the current temp to use when checking the previous measurement
@@ -278,7 +278,7 @@ except:
     print("Unable to initialize the Sense HAT library:", sys.exc_info()[0])
     sys.exit(1)
 
-print("Initialization complete!")
+print("Initialization complete - posting data to endpoints!")
 
 # Now see what we're supposed to do next
 if __name__ == "__main__":

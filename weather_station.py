@@ -6,7 +6,7 @@
 #  This is a Raspberry Pi project that measures weather values (temperature, humidity and pressure) using
 #  the Astro Pi Sense HAT then uploads the data to a Weather Underground weather station.
 #  Opens Source refs from: much of the Pi HAT code attributed John Wargo's wonderful walkthrough found here:
-#  Many thanks to Mr. Kramer for hookin me up on the AWS mentorship. 
+#  Many thanks to Mr. Kramer for hookin me up on the AWS mentorship.
 #  great ref on AWS: Calvin Boey (https://github.com/szazo/DHT11_Python)
 # ****************************************************************************************
 
@@ -203,7 +203,7 @@ def main():
                         "action": "updateraw",
                         "ID": wu_station_id,
                         "PASSWORD": wu_station_key,
-                        "dateutc": "now",
+                        "dateutc": now,
                         "tempf": str(temp_f),
                         "humidity": str(humidity),
                         "baromin": str(pressure),
@@ -256,7 +256,7 @@ def main():
 # here's where we start doing stuff
 # ============================================================================
 print(SLASH_N + HASHES)
-print(SINGLE_HASH, "Temp, Humidity, Barometric Pressue ", SINGLE_HASH)
+print(SINGLE_HASH, "Temp, Humidity, Barometric Pressure", SINGLE_HASH)
 print(SINGLE_HASH, "By Dan Beerman", SINGLE_HASH)
 print(HASHES)
 

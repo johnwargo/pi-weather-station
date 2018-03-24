@@ -196,6 +196,32 @@ def main():
                     # set last_temp to the current temperature before we measure again
                     last_temp = temp_f
 
+                    weather_data = {
+                        "action": "updateraw",
+                        "ID": wu_station_id,
+                        "PASSWORD": wu_station_key,
+                        "dateutc": "now",
+                        "tempf": str(temp_f),
+                        "humidity": str(humidity),
+                        "baromin": str(pressure),
+                    }
+                    # ========================================================
+                    # Upload the weather data to AWS Lambda
+                    # ========================================================
+                    # is weather upload enabled (True)?
+                    if WEATHER_UPLOAD:
+                        print("Uploading data to Lambda")
+                        try:
+                            url_data = urlencode(weather_data)
+                            response = urllib2.urlopen("http://ec2-52-32-20-150.us-west-2.compute.amazonaws.com:3000/", url_data)
+                            html = response.read()
+                            print("Server response:", html)
+                            # do something
+                            response.close()  # best practice to close the file
+                        except:
+                            print("Exception:", sys.exc_info()[0], SLASH_N)
+                    else:
+                        print("Skipping Lambda upload")
                     # ========================================================
                     # Upload the weather data to Weather Underground
                     # ========================================================
@@ -204,15 +230,6 @@ def main():
                         # From http://wiki.wunderground.com/index.php/PWS_-_Upload_Protocol
                         print("Uploading data to Weather Underground")
                         # build a weather data object
-                        weather_data = {
-                            "action": "updateraw",
-                            "ID": wu_station_id,
-                            "PASSWORD": wu_station_key,
-                            "dateutc": "now",
-                            "tempf": str(temp_f),
-                            "humidity": str(humidity),
-                            "baromin": str(pressure),
-                        }
                         try:
                             upload_url = WU_URL + "?" + urlencode(weather_data)
                             response = urllib2.urlopen(upload_url)

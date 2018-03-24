@@ -1,12 +1,14 @@
 #!/usr/bin/python
-# *****************************************************************************************************************
+# ****************************************************************************************
 #  AWS Pi Temperature Station
 #  By Dan Beerman
-#
+# ------------------------------------------
 #  This is a Raspberry Pi project that measures weather values (temperature, humidity and pressure) using
 #  the Astro Pi Sense HAT then uploads the data to a Weather Underground weather station.
-#  Opens Source refs from: John Wargo, Calvin Boey (https://github.com/szazo/DHT11_Python)
-# ********************************************************************************************************************'''
+#  Opens Source refs from: much of the Pi HAT code attributed John Wargo's wonderful walkthrough found here:
+#  Many thanks to Mr. Kramer for hookin me up on the AWS mentorship. 
+#  great ref on AWS: Calvin Boey (https://github.com/szazo/DHT11_Python)
+# ****************************************************************************************
 
 from __future__ import print_function
 
@@ -31,6 +33,7 @@ MEASUREMENT_INTERVAL = 2  # minutes
 WEATHER_UPLOAD = True
 # the weather underground URL used to upload weather data
 WU_URL = "http://weatherstation.wunderground.com/weatherstation/updateweatherstation.php"
+EC2 = "http://ec2-34-210-122-38.us-west-2.compute.amazonaws.com:3000/"
 # some string constants
 SINGLE_HASH = "#"
 HASHES = "########################################"
@@ -213,7 +216,7 @@ def main():
                         print("Uploading data to Lambda")
                         try:
                             url_data = urlencode(weather_data)
-                            response = urllib2.urlopen("http://ec2-52-32-20-150.us-west-2.compute.amazonaws.com:3000/", url_data)
+                            response = urllib2.urlopen(EC2, url_data)
                             html = response.read()
                             print("Server response:", html)
                             # do something

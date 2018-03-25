@@ -89,7 +89,6 @@ def get_cpu_temp():
     res = os.popen('vcgencmd measure_temp').readline()
     return float(res.replace("temp=", "").replace("'C\n", ""))
 
-
 # use moving average to smooth readings
 def get_smooth(x):
     # do we have the t object?
@@ -187,18 +186,20 @@ def main():
                     # did the temperature go up or down?
                     if last_temp != temp_f:
                         if last_temp > temp_f:
-                            # display a blue, down arrow
+                            # display a blue, down arrow +  temp
                             sense.set_pixels(arrow_down)
+                            sense.show_message(temp_f)
                         else:
-                            # display a red, up arrow
+                            # display a red, up arrow + temp
                             sense.set_pixels(arrow_up)
+                            sense.show_message(temp_f)
                     else:
                         # temperature stayed the same
                         # display red and blue bars
                         sense.set_pixels(bars)
+                        sense.show_message(temp_f)
                     # set last_temp to the current temperature before we measure again
                     last_temp = temp_f
-
                     weather_data = {
                         "action": "updateraw",
                         "ID": wu_station_id,
@@ -213,18 +214,22 @@ def main():
                     # ========================================================
                     # is weather upload enabled (True)?
                     if WEATHER_UPLOAD:
-                        print("Uploading data to Lambda")
+                        print("Uploading data to EC2 Instance")
                         try:
                             url_data = urlencode(weather_data)
                             response = urllib2.urlopen(EC2, url_data)
                             html = response.read()
                             print("Server response:", html)
+                            sense.show_message("AWS: "+ html, text_colour=[
+                                               32, 178, 170], back_colour=[0, 100, 0])
                             # do something
                             response.close()  # best practice to close the file
                         except:
                             print("Exception:", sys.exc_info()[0], SLASH_N)
+                            sense.show_message("AWS: " + sys.exc_info()[0], text_colour=[
+                                               0, 255, 0], back_colour=[0, 0, 255])
                     else:
-                        print("Skipping Lambda upload")
+                        print("Skipping AWS Upload")
                     # ========================================================
                     # Upload the weather data to Weather Underground
                     # ========================================================
@@ -247,7 +252,7 @@ def main():
 
         # wait a second then check again
         # You can always increase the sleep value below to check less often
-        time.sleep(1)  # this should never happen since the above is an infinite loop
+        time.sleep(3)  # this should never happen since the above is an infinite loop
 
     print("Leaving main()")
 
@@ -256,8 +261,9 @@ def main():
 # here's where we start doing stuff
 # ============================================================================
 print(SLASH_N + HASHES)
-print(SINGLE_HASH, "Temp, Humidity, Barometric Pressure", SINGLE_HASH)
-print(SINGLE_HASH, "By Dan Beerman", SINGLE_HASH)
+print(SINGLE_HASH, "ClimaStatus - a Pi HAT Weather Station     ", SINGLE_HASH)
+print(SINGLE_HASH, "By Dan Beerman. POSTing data to WU and AWS:", SINGLE_HASH)
+print(SINGLE_HASH, "Temp, Humidity, Barometric Pressure        ", SINGLE_HASH)
 print(HASHES)
 
 # make sure we don't have a MEASUREMENT_INTERVAL > 60
@@ -278,7 +284,7 @@ if (wu_station_id is None) or (wu_station_key is None):
 # we made it this far, so it must have worked...
 print("Successfully read Weather Underground configuration values")
 print("Station ID:", wu_station_id)
-# print("Station key:", wu_station_key)
+print("Station key:", wu_station_key)
 
 # ============================================================================
 # initialize the Sense HAT object
@@ -288,12 +294,12 @@ try:
     sense = SenseHat()
     # sense.set_rotation(180)
     # then write some text to the Sense HAT's 'screen'
-    sense.show_message("Initialized", text_colour=[255, 255, 0], back_colour=[0, 0, 255])
+    sense.show_message("Party On!", text_colour=[255, 255, 0], back_colour=[0, 0, 255])
     # clear the screen
     sense.clear()
     # get the current temp to use when checking the previous measurement
     last_temp = round(c_to_f(get_temp()), 1)
-    print("Current temperature reading:", last_temp)
+    print("Current temperature reading: ", last_temp)
 except:
     print("Unable to initialize the Sense HAT library:", sys.exc_info()[0])
     sys.exit(1)

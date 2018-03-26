@@ -38,6 +38,9 @@ EC2 = "http://ec2-34-210-122-38.us-west-2.compute.amazonaws.com:3000/"
 SINGLE_HASH = "#"
 HASHES = "########################################"
 SLASH_N = "\n"
+# LED display settings
+
+LOW_LIGHT_MODE = True
 
 # constants used to display an up and down arrows plus bars
 # modified from https://www.raspberrypi.org/learning/getting-started-with-the-sense-hat/worksheet/
@@ -129,6 +132,18 @@ def get_temp():
     # Return the calculated temperature
     return t_corr
 
+def toggleLLmode():
+    global LOW_LIGHT_MODE
+    LOW_LIGHT_MODE = (LOW_LIGHT_MODE != True)
+    if (LOW_LIGHT_MODE):
+	sense.low_light = True
+    else:
+	sense.low_light = False
+
+def joystickToggleLL():
+    global LOW_LIGHT_MODE
+    toggleLLmode()
+    sense.set_pixel(str(LOW_LIGHT_MODE))
 
 def main():
     global last_temp
@@ -170,7 +185,7 @@ def main():
             # convert pressure from millibars to inHg before posting
             pressure = round(sense.get_pressure() * 0.0295300, 1)
             print("Temp: %sF (%sC), Pressure: %s inHg, Humidity: %s%%" % (temp_f, temp_c, pressure, humidity))
-
+	    sense.show_message(str(temp_f))
             # get the current minute
             current_minute = datetime.datetime.now().minute
             # is it the same minute as the last time we checked?
@@ -188,18 +203,17 @@ def main():
                         if last_temp > temp_f:
                             # display a blue, down arrow +  temp
                             sense.set_pixels(arrow_down)
-                            sense.show_message(temp_f)
                         else:
                             # display a red, up arrow + temp
                             sense.set_pixels(arrow_up)
-                            sense.show_message(temp_f)
                     else:
                         # temperature stayed the same
                         # display red and blue bars
                         sense.set_pixels(bars)
-                        sense.show_message(temp_f)
                     # set last_temp to the current temperature before we measure again
                     last_temp = temp_f
+
+		    # SET API PAYLOAD
                     weather_data = {
                         "action": "updateraw",
                         "ID": wu_station_id,
@@ -220,13 +234,14 @@ def main():
                             response = urllib2.urlopen(EC2, url_data)
                             html = response.read()
                             print("Server response:", html)
-                            sense.show_message("AWS: "+ html, text_colour=[
+                            sense.show_message("Payload Upload", text_colour=[
                                                32, 178, 170], back_colour=[0, 100, 0])
+			    sense.clear()
                             # do something
                             response.close()  # best practice to close the file
                         except:
                             print("Exception:", sys.exc_info()[0], SLASH_N)
-                            sense.show_message("AWS: " + sys.exc_info()[0], text_colour=[
+                            sense.show_message( sys.exc_info()[0], text_colour=[
                                                0, 255, 0], back_colour=[0, 0, 255])
                     else:
                         print("Skipping AWS Upload")
@@ -252,7 +267,7 @@ def main():
 
         # wait a second then check again
         # You can always increase the sleep value below to check less often
-        time.sleep(3)  # this should never happen since the above is an infinite loop
+        time.sleep(1)  # this should never happen since the above is an infinite loop
 
     print("Leaving main()")
 
@@ -292,8 +307,9 @@ print("Station key:", wu_station_key)
 try:
     print("Initializing the Sense HAT client")
     sense = SenseHat()
-    # sense.set_rotation(180)
+    sense.set_rotation(180)
     # then write some text to the Sense HAT's 'screen'
+    # sense.show_message("Low Light: " + LOW_LIGHT_MODE, scroll_speed=0.5)
     sense.show_message("Party On!", text_colour=[255, 255, 0], back_colour=[0, 0, 255])
     # clear the screen
     sense.clear()

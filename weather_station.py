@@ -241,7 +241,7 @@ def main():
                             response.close()  # best practice to close the file
                         except:
                             print("Exception:", sys.exc_info()[0], SLASH_N)
-                            sense.show_message( sys.exc_info()[0], text_colour=[
+                            sense.show_message( str(sys.exc_info()[0]), text_colour=[
                                                0, 255, 0], back_colour=[0, 0, 255])
                     else:
                         print("Skipping AWS Upload")

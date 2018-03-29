@@ -32,8 +32,8 @@ AWS_UPLOAD = True
 WU_URL = "http://weatherstation.wunderground.com/weatherstation/updateweatherstation.php"
 EC2 = "http://ec2-34-210-122-38.us-west-2.compute.amazonaws.com:3000/"
 # for style
-SINGLE_HASH = "#"
-HASHES = "#############################################"
+SINGLE_HASH = "|"
+HASHES = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 SLASH_N = "\n"
 # LED display settings
 LOW_LIGHT_MODE = True

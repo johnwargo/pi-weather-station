@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python:
 # ****************************************************************************************
 #  AWS Pi Temperature Station
 #  By Dan Beerman
@@ -9,45 +9,40 @@
 #  Many thanks to Mr. Kramer for hookin me up on the AWS mentorship.
 #  great ref on AWS: Calvin Boey (https://github.com/szazo/DHT11_Python)
 # ****************************************************************************************
-
 from __future__ import print_function
-
 import datetime
 import os
 import sys
 import time
 from urllib import urlencode
-
 import urllib2
+import socket
+
 from sense_hat import SenseHat
-
 from config import Config
-
 # ============================================================================
-# Constants
+# Constants  (Change vals when testing the code, etc)
 # ============================================================================
-# specifies how often to measure values from the Sense HAT (in minutes)
-MEASUREMENT_INTERVAL = 2  # minutes
-# Set to False when testing the code and/or hardware
-# Set to True to enable upload of weather data to Weather Underground
+# how often POST data / save Sense HAT measurements (in minutes)
+MEASUREMENT_INTERVAL = 1
+# Enable upload for various endpoints:
 WEATHER_UPLOAD = True
-# the weather underground URL used to upload weather data
+AWS_UPLOAD = True
+# Endpoint address:
 WU_URL = "http://weatherstation.wunderground.com/weatherstation/updateweatherstation.php"
 EC2 = "http://ec2-34-210-122-38.us-west-2.compute.amazonaws.com:3000/"
-# some string constants
-SINGLE_HASH = "#"
-HASHES = "########################################"
+# for style
+SINGLE_HASH = "|"
+HASHES = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 SLASH_N = "\n"
 # LED display settings
-
 LOW_LIGHT_MODE = True
-
-# constants used to display an up and down arrows plus bars
-# modified from https://www.raspberrypi.org/learning/getting-started-with-the-sense-hat/worksheet/
-# set up the colours (blue, red, empty)
 b = [0, 0, 255]  # blue
 r = [255, 0, 0]  # red
 e = [0, 0, 0]  # empty
+# constants used to display an up and down arrows plus bars
+# modified from https://www.raspberrypi.org/learning/getting-started-with-the-sense-hat/worksheet/
+# set up the colours (blue, red, empty)
 # create images for up and down arrows
 arrow_up = [
     e, e, e, r, r, e, e, e,
@@ -80,11 +75,9 @@ bars = [
     e, e, e, e, e, e, e, e
 ]
 
-
 def c_to_f(input_temp):
-    # convert input_temp from Celsius to Fahrenheit
+    # convert Celsius to Fahrenheit
     return (input_temp * 1.8) + 32
-
 
 def get_cpu_temp():
     # 'borrowed' from https://www.raspberrypi.org/forums/viewtopic.php?f=104&t=111457
@@ -92,8 +85,8 @@ def get_cpu_temp():
     res = os.popen('vcgencmd measure_temp').readline()
     return float(res.replace("temp=", "").replace("'C\n", ""))
 
-# use moving average to smooth readings
 def get_smooth(x):
+    # use moving average to smooth readings
     # do we have the t object?
     if not hasattr(get_smooth, "t"):
         # then create it
@@ -109,12 +102,9 @@ def get_smooth(x):
 
 def get_temp():
     # ====================================================================
-    # Unfortunately, getting an accurate temperature reading from the
-    # Sense HAT is improbable, see here:
+    # Getting an accurate temperature reading from the Sense HAT is improbable:
     # https://www.raspberrypi.org/forums/viewtopic.php?f=104&t=111457
-    # so we'll have to do some approximation of the actual temp
-    # taking CPU temp into account. The Pi foundation recommended
-    # using the following:
+    # The Pi foundation recommended using the following:
     # http://yaab-arduino.blogspot.co.uk/2016/08/accurate-temperature-reading-sensehat.html
     # ====================================================================
     # First, get temp readings from both sensors
@@ -133,87 +123,87 @@ def get_temp():
     return t_corr
 
 def toggleLLmode():
-    global LOW_LIGHT_MODE
+    # Toggle the brightness on the LED display 
     LOW_LIGHT_MODE = (LOW_LIGHT_MODE != True)
     if (LOW_LIGHT_MODE):
 	sense.low_light = True
     else:
 	sense.low_light = False
 
-def joystickToggleLL():
-    global LOW_LIGHT_MODE
-    toggleLLmode()
-    sense.set_pixel(str(LOW_LIGHT_MODE))
+def pushed_up():
+    sense = SenseHat()
+    sense.show_message(str(socket.gethostbyname(socket.gethostname())))
+
+def pushed_down():
+    sense = SenseHat()
+    sense.show_message("HIRE ME!",
+                       text_colour=[255, 255, 0])
+
+# Listen for joystick key
+def joystick():
+    sense = SenseHat()
+    sense.stick.direction_up = pushed_up()
+    sense.stick.direction_down = pushed_down()
+    sense.stick.direction_left = pushed_left()
+    sense.stick.direction_right = pushed_right()
 
 def main():
     global last_temp
-
     # initialize the lastMinute variable to the current time to start
-    last_minute = datetime.datetime.now().minute
     # on startup, just use the previous minute as lastMinute
+    last_minute = datetime.datetime.now().minute
     last_minute -= 1
     if last_minute == 0:
         last_minute = 59
-
-    # infinite loop to continuously check weather values
+    
     while 1:
-        # The temp measurement smoothing algorithm's accuracy is based
-        # on frequent measurements, so we'll take measurements every 5 seconds
-        # but only upload on measurement_interval
+        # infinite loop to continuously check weather values
+        # Measure every 5 seconds - for smoothing algorithm, POST every MEASUREMENT_INTERVAL
         current_second = datetime.datetime.now().second
-        # are we at the top of the minute or at a 5 second interval?
         if (current_second == 0) or ((current_second % 5) == 0):
             # ========================================================
-            # read values from the Sense HAT
+            # Read values from the Sense HAT
             # ========================================================
-            # Calculate the temperature. The get_temp function 'adjusts' the recorded temperature adjusted for the
-            # current processor temp in order to accommodate any temperature leakage from the processor to
-            # the Sense HAT's sensor. This happens when the Sense HAT is mounted on the Pi in a case.
-            # If you've mounted the Sense HAT outside of the Raspberry Pi case, then you don't need that
-            # calculation. So, when the Sense HAT is external, replace the following line (comment it out  with a #)
+            # get_temp function 'adjusts' the recorded temp in order to accommodate radiation from the processor
+            # When Sense HAT is mounted on the Pi in a case, is significant.
+            # NOTE: when the Sense HAT is external, comment this out (#):
             calc_temp = get_temp()
-            # with the following line (uncomment it, remove the # at the line start)
+            # Then uncomment either of the following:
             # calc_temp = sense.get_temperature_from_pressure()
-            # or the following line (each will work)
             # calc_temp = sense.get_temperature_from_humidity()
             # ========================================================
-            # At this point, we should have an accurate temperature, so lets use the recorded (or calculated)
-            # temp for our purposes
+            # Now get the data packaged up:
             temp_c = round(calc_temp, 1)
             temp_f = round(c_to_f(calc_temp), 1)
             humidity = round(sense.get_humidity(), 0)
-            # convert pressure from millibars to inHg before posting
+            # convert P from millibars to inHg before POST
             pressure = round(sense.get_pressure() * 0.0295300, 1)
             print("Temp: %sF (%sC), Pressure: %s inHg, Humidity: %s%%" % (temp_f, temp_c, pressure, humidity))
-	    sense.show_message(str(temp_f))
+	    sense.show_message(str(temp_f)+"F")
             # get the current minute
             current_minute = datetime.datetime.now().minute
             # is it the same minute as the last time we checked?
             if current_minute != last_minute:
-                # reset last_minute to the current_minute
                 last_minute = current_minute
-                # is minute zero, or divisible by 10?
-                # we're only going to take measurements every MEASUREMENT_INTERVAL minutes
+                # Take measurements every MEASUREMENT_INTERVAL
                 if (current_minute == 0) or ((current_minute % MEASUREMENT_INTERVAL) == 0):
-                    # get the reading timestamp
+                    # timestamp
                     now = datetime.datetime.now()
                     print("\n%d minute mark (%d @ %s)" % (MEASUREMENT_INTERVAL, current_minute, str(now)))
-                    # did the temperature go up or down?
+                    # did the temperature go up or down? Changes disp. momentarily
                     if last_temp != temp_f:
                         if last_temp > temp_f:
-                            # display a blue, down arrow +  temp
                             sense.set_pixels(arrow_down)
                         else:
-                            # display a red, up arrow + temp
                             sense.set_pixels(arrow_up)
                     else:
-                        # temperature stayed the same
-                        # display red and blue bars
+                        # temperature stayed the same: Bars!
                         sense.set_pixels(bars)
-                    # set last_temp to the current temperature before we measure again
+                    # save the temp
                     last_temp = temp_f
-
-		    # SET API PAYLOAD
+                    # ========================================================
+                    # SHAPE THE POST DATA
+                    # ========================================================
                     weather_data = {
                         "action": "updateraw",
                         "ID": wu_station_id,
@@ -224,41 +214,39 @@ def main():
                         "baromin": str(pressure),
                     }
                     # ========================================================
-                    # Upload the weather data to AWS Lambda
+                    # UPLOAD TO EC2   (UPLOAD === True?)
                     # ========================================================
-                    # is weather upload enabled (True)?
-                    if WEATHER_UPLOAD:
+                    if AWS_UPLOAD:
                         print("Uploading data to EC2 Instance")
                         try:
                             url_data = urlencode(weather_data)
                             response = urllib2.urlopen(EC2, url_data)
                             html = response.read()
+                            # on succesful upload - have a visual cue!
                             print("Server response:", html)
-                            sense.show_message("Payload Upload", text_colour=[
+                            sense.show_message("POSTED", text_colour=[
                                                32, 178, 170], back_colour=[0, 100, 0])
 			    sense.clear()
-                            # do something
                             response.close()  # best practice to close the file
                         except:
-                            print("Exception:", sys.exc_info()[0], SLASH_N)
-                            sense.show_message( str(sys.exc_info()[0]), text_colour=[
+                            print("Exception: ", sys.exc_info()[0], SLASH_N)
+                            sense.show_message(str(sys.exc_info()[0]), text_colour=[
                                                0, 255, 0], back_colour=[0, 0, 255])
                     else:
                         print("Skipping AWS Upload")
                     # ========================================================
-                    # Upload the weather data to Weather Underground
+                    # UPLOAD TO WU    (UPLOAD === True)
                     # ========================================================
                     # is weather upload enabled (True)?
                     if WEATHER_UPLOAD:
                         # From http://wiki.wunderground.com/index.php/PWS_-_Upload_Protocol
                         print("Uploading data to Weather Underground")
-                        # build a weather data object
                         try:
                             upload_url = WU_URL + "?" + urlencode(weather_data)
                             response = urllib2.urlopen(upload_url)
                             html = response.read()
+                            # on succesful upload - have a visual cue!
                             print("Server response:", html)
-                            # do something
                             response.close()  # best practice to close the file
                         except:
                             print("Exception:", sys.exc_info()[0], SLASH_N)
@@ -307,10 +295,11 @@ print("Station key:", wu_station_key)
 try:
     print("Initializing the Sense HAT client")
     sense = SenseHat()
-    sense.set_rotation(180)
+    sense.set_rotation(0)
     # then write some text to the Sense HAT's 'screen'
     # sense.show_message("Low Light: " + LOW_LIGHT_MODE, scroll_speed=0.5)
-    sense.show_message("Party On!", text_colour=[255, 255, 0], back_colour=[0, 0, 255])
+    sense.show_message("   Party On!", text_colour=[255, 255, 0], back_colour=[0, 0, 255])
+    # sense.show_message("IP: ", str(subprocess.run("ips", stdout=subprocess.PIPE)))
     # clear the screen
     sense.clear()
     # get the current temp to use when checking the previous measurement
@@ -327,5 +316,7 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
+        sense.show_message("Goodbye")
+        sense.clear()
         print("\nExiting application\n")
         sys.exit(0)

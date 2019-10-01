@@ -142,8 +142,8 @@ Figure 1 - Raspberry Pi Weather Station
 
 ## Revision History
 
-10/01/2019 - Updated the readme file, clarified the GitHub instructions.
-09/12/2016 - On recommendation from the Raspberry Pi Foundation, changed the algorithm for guestimating ambient temperature from [this article](http://yaab-arduino.blogspot.co.uk/2016/08/accurate-temperature-reading-sensehat.html).
++ 10/01/2019 - Updated the readme file, clarified the GitHub instructions and fixed one typo
++ 09/12/2016 - On recommendation from the Raspberry Pi Foundation, changed the algorithm for guestimating ambient temperature from [this article](http://yaab-arduino.blogspot.co.uk/2016/08/accurate-temperature-reading-sensehat.html).
 
 ***
 

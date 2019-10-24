@@ -13,7 +13,7 @@ This project is very easy to assemble, all you need is the following 4 parts, an
 + Raspberry Pi case. The only commercial case I could find that supports the Sense HAT is the [Zebra Case](http://c4labs.net/collections/all/zebra-case) from C4 Labs with the [Official Sense HAT upgrade for Zebra Case](http://c4labs.net/products/official-sense-hat-upgrade-for-zebra-case). You can also 3D print a case, you can find plans here: [http://www.thingiverse.com/thing:1200534](http://www.thingiverse.com/thing:1200534).
 + Raspberry Pi Power Adapter. I used this one from [Amazon](http://amzn.to/29VVzT4). 
 
-**Note:** *When I started this project, there were quite a few companies selling Sense HAT devices, but very few of them had stock available. I finally found I could purchase one of the through Amazon.com, but when I plugged everything together and ran my code, I got results that didn't make sense. After sending that board back and getting another one with the same problem, I discovered it wasn't my code at fault. It turns out that Astro Pi used some faulty components in a batch of them and had to fix that problem before shipping any more. Refer to [Defective Astro Pi Sense HAT Boards](http://johnwargo.com/index.php/microcontrollers-single-board-computers/defective-astro-pi-sense-hat-boards.html) for more information about the faulty Sense HAT boards.*
+> NOTE: When I started this project, there were quite a few companies selling Sense HAT devices, but very few of them had stock available. I finally found I could purchase one of the through Amazon.com, but when I plugged everything together and ran my code, I got results that didn't make sense. After sending that board back and getting another one with the same problem, I discovered it wasn't my code at fault. It turns out that Astro Pi used some faulty components in a batch of them and had to fix that problem before shipping any more. Refer to [Defective Astro Pi Sense HAT Boards](http://johnwargo.com/index.php/microcontrollers-single-board-computers/defective-astro-pi-sense-hat-boards.html) for more information about the faulty Sense HAT boards.
 
 ## Project Files
 
@@ -29,7 +29,7 @@ The project folder contains several files and one folder:
 
 Assembly is easy - mount the Sense HAT on the Raspberry Pi then insert it in the case and plug it into power. All set! No wiring, soldering or anything else required.
 
-**Note:** *The Raspberry Pi foundation recommend you mount the Sense HAT to the Raspberry Pi using [standoffs](http://www.mouser.com/Electromechanical/Hardware/Standoffs-Spacers/_/N-aictf) and the Sense HAT I purchased included them in the package. Unfortunately, standoffs are incompatible with the C4 Labs Zebra Case and their Official Sense HAT upgrade for Zebra Case. Be sure to omit standoffs if using this case.*
+> NOTE: The Raspberry Pi foundation recommend you mount the Sense HAT to the Raspberry Pi using [standoffs](http://www.mouser.com/Electromechanical/Hardware/Standoffs-Spacers/_/N-aictf) and the Sense HAT I purchased included them in the package. Unfortunately, standoffs are incompatible with the C4 Labs Zebra Case and their Official Sense HAT upgrade for Zebra Case. Be sure to omit standoffs if using this case.
 
 ## Weather Underground Setup
 
@@ -47,7 +47,7 @@ sudo apt-get install sense-hat
 
 This command installs the support packages for the Sense HAT.
 
-## Installation
+> NOTE: One user shared the following information: "A couple of changes were necessary to get things operational.  Firstly enabling I2C either from raps-config or the GUI since it doesn't come automatically enabled when Raspbian is installed.  The second is adding a line to config.txt.  Execute `sudo nano /boot/config.txt`, scroll to the bottom and add `dtoverlay=rpi-sense` to the end of the file.  Then save and exit nano." I didn't need to do either of these on my Pi, but your results may vary. 
 
 Assuming the terminal window is pointing to the Pi user's home folder, in open terminal window, execute the following command:
 
@@ -120,10 +120,16 @@ There are a few steps you must complete to configure the Raspberry Pi so it exec
 chmod +x start-station.sh
 ```
 
-Next, you'll need to open the pi user's session autostart file using the following command:  
+Next, you'll need to open the pi user's session `autostart` file; when I first created this project, you would edit the file using the following command: 
 
 ``` shell
 sudo nano ~/.config/lxsession/LXDE-pi/autostart
+```
+
+They moved the `autostart` file in later version(s) of Raspbian,  so to edit the file, use the following command: 
+
+```shell
+sudo nano /etc/xdg/lxsession/LXDE-pi/autostart
 ```
 
 Add the following lines to the end (bottom) of the file:
@@ -142,9 +148,11 @@ Figure 1 - Raspberry Pi Weather Station
 
 ## Revision History
 
-+ 10/01/2019 - Updated the readme file, clarified the GitHub instructions and fixed one typo
++ 10/24/2019 - Updated the readme (again) based on another user's feedback.
++ 10/01/2019 - Updated the readme file, clarified the GitHub instructions and fixed one typo.
 + 09/12/2016 - On recommendation from the Raspberry Pi Foundation, changed the algorithm for guestimating ambient temperature from [this article](http://yaab-arduino.blogspot.co.uk/2016/08/accurate-temperature-reading-sensehat.html).
 
 ***
 
-You can find information on many different topics on my [personal blog](http://www.johnwargo.com). Learn about all of my publications at [John Wargo Books](http://www.johnwargobooks.com).
+If you find this code useful, and feel like thanking me for providing it, please consider making a purchase from [my Amazon Wish List](https://amzn.com/w/1WI6AAUKPT5P9). You can find information on many different topics on my [personal blog](http://www.johnwargo.com). Learn about all of my publications at [John Wargo Books](http://www.johnwargobooks.com). 
+

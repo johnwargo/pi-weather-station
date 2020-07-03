@@ -2,6 +2,8 @@
 
 > **Note:** Weather Underground announced they were shutting down the weather API in [End of Service for the Weather Underground API](https://apicommunity.wunderground.com/weatherapi/topics/end-of-service-for-the-weather-underground-api) but seem to continue to support personal weather stations. A user reported that the API endpoint changed, but I can't find any data to confirm that, so you'll have to figure that out yourself.
 
+> **Another Note**: If you have an issue with this project, open an issue [here](https://github.com/johnwargo/pi_weather_station/issues).  In the past, people have emailed me or posted questions to other forums - the easiest way to get the author (me) to help you is to just ask, here. 
+
 This is a Raspberry Pi project that measures weather values (temperature, humidity and pressure) using the Astro Pi Sense HAT then uploads the data to a Weather Underground weather station. The Sense HAT board includes instruments that measure temperature, humidity and barometric pressure plus an 8x8 LED display, a joystick, and an accelerometer.  The HAT was created by the folks at [Astro Pi](https://astro-pi.org/); elementary school children were solicited to create experiments using the Sense HAT it that would be executed on the International Space Station. Eventually, many experiments were selected and an astronaut performed them and sent back the results for analysis. I read different articles about this board, so I decided to create a project using it. I'd wanted to install a weather station in my yard and upload the weather data to [Weather Underground](www.weatherunderground.com); the Sense HAT and a Raspberry Pi seemed like a great way to do this.
 
 Note: If you'd like to display one of the measurements on the display instead of the arrows this app uses, take a look at this: [http://yaab-arduino.blogspot.co.uk/2016/08/display-two-digits-numbers-on-raspberry.html](http://yaab-arduino.blogspot.co.uk/2016/08/display-two-digits-numbers-on-raspberry.html).
@@ -90,7 +92,7 @@ WEATHER_UPLOAD = False
 ```
 
 ## Testing the Application
-  
+
 To execute the data collection application, open a terminal window, navigate to the folder where you copied the project files and execute the following command:
 
 ``` shell
@@ -141,7 +143,7 @@ Add the following lines to the end (bottom) of the file:
 ```
 
 To save your changes, press ctrl-o then press the Enter key. Next, press ctrl-x to exit the nano application.
-  
+
 Reboot the Raspberry Pi. When it restarts, both python processes should execute in a terminal window as shown in Figure 4.
 
 ![Weather Monitor Home Page](screenshots/pi-weather-station-800.png)

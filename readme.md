@@ -1,6 +1,6 @@
 # Pi Weather Station
 
-> **Note:** Weather Underground announced they were shutting down the weather API in [End of Service for the Weather Underground API](https://apicommunity.wunderground.com/weatherapi/topics/end-of-service-for-the-weather-underground-api) but seem to continue to support personal weather stations. A user reported that the API endpoint changed, but I can't find any data to confirm that, so you'll have to figure that out yourself.
+> **Note:** Weather Underground announced they were shutting down the weather API in [End of Service for the Weather Underground API](https://apicommunity.wunderground.com/weatherapi/topics/end-of-service-for-the-weather-underground-api) but seem to continue to support personal weather stations. A user reported that the API endpoint changed, but I can't find any data to confirm that, so you'll have to figure that out yourself. Sorry.
 
 > **Another Note**: If you have an issue with this project, open an issue [here](https://github.com/johnwargo/pi_weather_station/issues).  In the past, people have emailed me or posted questions to other forums - the easiest way to get the author (me) to help you is to just ask, here. 
 
@@ -17,7 +17,7 @@ This project is very easy to assemble, all you need is the following 4 parts, an
 + Raspberry Pi case. The only commercial case I could find that supports the Sense HAT is the [Zebra Case](http://c4labs.net/collections/all/zebra-case) from C4 Labs with the [Official Sense HAT upgrade for Zebra Case](http://c4labs.net/products/official-sense-hat-upgrade-for-zebra-case). You can also 3D print a case, you can find plans here: [http://www.thingiverse.com/thing:1200534](http://www.thingiverse.com/thing:1200534).
 + Raspberry Pi Power Adapter. I used this one from [Amazon](http://amzn.to/29VVzT4). 
 
-> NOTE: When I started this project, there were quite a few companies selling Sense HAT devices, but very few of them had stock available. I finally found I could purchase one of the through Amazon.com, but when I plugged everything together and ran my code, I got results that didn't make sense. After sending that board back and getting another one with the same problem, I discovered it wasn't my code at fault. It turns out that Astro Pi used some faulty components in a batch of them and had to fix that problem before shipping any more. Refer to [Defective Astro Pi Sense HAT Boards](http://johnwargo.com/index.php/microcontrollers-single-board-computers/defective-astro-pi-sense-hat-boards.html) for more information about the faulty Sense HAT boards.
+> NOTE: When I started this project (2016?), there were quite a few companies selling Sense HAT devices, but very few of them had stock available. I finally found I could purchase one of the through Amazon.com, but when I plugged everything together and ran my code, I got results that didn't make sense. After sending that board back and getting another one with the same problem, I discovered it wasn't my code at fault. It turns out that Astro Pi used some faulty components in a batch of them and had to fix that problem before shipping any more. Refer to [Defective Astro Pi Sense HAT Boards](http://johnwargo.com/index.php/microcontrollers-single-board-computers/defective-astro-pi-sense-hat-boards.html) for more information about the faulty Sense HAT boards.
 
 ## Project Files
 
@@ -43,15 +43,19 @@ Weather Underground (WU) is a public weather service now owned by the Weather Ch
 
 Download the Raspbian image from [raspberrypi.org](https://www.raspberrypi.org/downloads/raspbian/) then burn it to an SD card using the instructions found at [Installing Operating System Images](https://www.raspberrypi.org/documentation/installation/installing-images/README.md). Raspbian should automatically prompt you to select a Wi-Fi network and perform a software update.
 
-Open a terminal window and execute the following command:
+When setup completes, you must enable the I2C protocol for the Sense HAT to work correctly. Open the Raspberry menu, select **Preferences**, then **Raspberry Pi Configuration**. When the application opens, select the **Interfaces** tab, enable the I2C protocol and click the **OK** button to save your changes.
+
+![Raspberry Pi Configuration](screenshots/pi-config.png)
+
+Next, open a terminal window and execute the following command:
 
 ``` shell
-sudo apt-get install sense-hat
+sudo apt install sense-hat
 ```
 
 This command installs the support packages for the Sense HAT.
 
-> NOTE: One user shared the following information: "A couple of changes were necessary to get things operational.  Firstly enabling I2C either from raps-config or the GUI since it doesn't come automatically enabled when Raspbian is installed.  The second is adding a line to config.txt.  Execute `sudo nano /boot/config.txt`, scroll to the bottom and add `dtoverlay=rpi-sense` to the end of the file.  Then save and exit nano." I didn't need to do either of these on my Pi, but your results may vary. 
+> NOTE: One user shared the following information: "Execute `sudo nano /boot/config.txt`, scroll to the bottom and add `dtoverlay=rpi-sense` to the end of the file.  Then save and exit nano." I didn't need to do this in my testing, but I wanted to share the information. 
 
 Assuming the terminal window is pointing to the Pi user's home folder, in open terminal window, execute the following command:
 
@@ -81,7 +85,7 @@ The main application file, `weather_station.py` has two configuration settings t
 MEASUREMENT_INTERVAL = 10  # minutes
 ```
 
-The `MEASUREMENT_INTERVAL` variable controls how often the application reads temperature measurements from the Sense HAT. To change how often the application checks temperature values, change the value on the right of the equals sign on the second line.
+The `MEASUREMENT_INTERVAL` variable controls how often the application uses temperature measurements from the Sense HAT. It will read the sensors on the HAT every 5 seconds, but uses this value to configure how frequently it updates the data to the Weather Underground server. 
 
 If you’re testing the application and don’t want the weather data uploaded to Weather Underground until you're ready, change the value for `WEATHER_UPLOAD` to `True` (case matters, so it has to be `True`, not `true`):
 
@@ -101,17 +105,21 @@ python ./weather_station.py
 
 The terminal window should quickly sprout the following output:
 
-``` text
-########################################
-# Pi Weather Station                   #
-# By John M. Wargo (www.johnwargo.com) #
-########################################
+```Text
+############################################
+# Pi Weather Station (Sense HAT)           #
+# By John M. Wargo (https://johnwargo.com) #
+############################################
+2020-07-04 07:02:43 INFO Initializing Weather Underground configuration
+2020-07-04 07:02:43 INFO Successfully read Weather Underground configuration
+2020-07-04 07:02:43 INFO Station ID: KNCCHARL225
+2020-07-04 07:02:43 INFO Initializing the Sense HAT client
+2020-07-04 07:02:46 INFO Initialization complete!
+2020-07-04 07:02:46 INFO Initial temperature reading: 69.1
+2020-07-04 07:02:50 INFO Temp: 69.1F (20.6C), Pressure: 29.4 inHg, Humidity: 39.0%
+2020-07-04 07:02:55 INFO Temp: 69.3F (20.7C), Pressure: 29.4 inHg, Humidity: 39.0%
+2020-07-04 07:03:00 INFO Temp: 69.5F (20.8C), Pressure: 29.4 inHg, Humidity: 38.0%
 
-Initializing Weather Underground configuration
-Successfully read Weather Underground configuration values
-Station ID: YOUR_ID
-Initializing the Sense HAT client
-Initialization complete!
 ```
 
 If you see something like that, you're golden. If not, figure out what any error messages mean, fix things, then try again. At this point, the application will start collecting data and uploading it to the Weather Underground every 10 minutes on the 10 minute mark (unless you changed the app's configuration to make the application work differently).
@@ -152,6 +160,7 @@ Figure 1 - Raspberry Pi Weather Station
 
 ## Revision History
 
++ 07-04-2020 - Added the Python Logging library to the project for cleaner and more useful output. Refactored the `main` function.
 + 10/24/2019 - Updated the readme (again) based on another user's feedback.
 + 10/01/2019 - Updated the readme file, clarified the GitHub instructions and fixed one typo.
 + 09/12/2016 - On recommendation from the Raspberry Pi Foundation, changed the algorithm for guestimating ambient temperature from [this article](http://yaab-arduino.blogspot.co.uk/2016/08/accurate-temperature-reading-sensehat.html).
